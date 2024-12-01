@@ -6,11 +6,11 @@ import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RestApi, LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
-import { Topic } from 'aws-cdk-lib/aws-sns';
+import { Subscription, SubscriptionProtocol, Topic } from 'aws-cdk-lib/aws-sns';
 import { EmailSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { Alarm, Metric } from 'aws-cdk-lib/aws-cloudwatch';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
+import * as sns from 'aws-cdk-lib/aws-sns';
 
 
 export class InventoryAutomationsStack extends cdk.Stack {
@@ -95,6 +95,17 @@ export class InventoryAutomationsStack extends cdk.Stack {
     });
     // Add an SNS action for the alarm
     itemCountAlarm.addAlarmAction(new SnsAction(notificationTopic));
+
+    const topic = new sns.Topic(this, 'NotificationTopic', {
+      topicName: 'NotificationTopic',
+    });
+
+    //Create a email Subscription
+    new Subscription(this, 'NotificationSubscription', {
+      topic: topic,
+      protocol: SubscriptionProtocol.EMAIL,
+      endpoint: 'fori.enchev@gmail.com'
+    });
   }
 }
 
